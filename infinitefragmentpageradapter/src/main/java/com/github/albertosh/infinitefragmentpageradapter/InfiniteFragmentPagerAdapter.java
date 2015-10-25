@@ -5,6 +5,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
+/**
+ * @author Alberto Sanz
+ * @since 25/10/2015
+ */
 public abstract class InfiniteFragmentPagerAdapter
         extends FragmentPagerAdapter
         implements ViewPager.OnPageChangeListener {
@@ -74,12 +78,20 @@ public abstract class InfiniteFragmentPagerAdapter
 
     private Fragment getPageChecked(int index) {
         Fragment fragment = getPage(index);
+        if (fragment instanceof InfiniteFragmentPagerFragmentImpl)
+            ((InfiniteFragmentPagerFragmentImpl)fragment).setGlobalPosition(index);
+
         if (fragment instanceof InfiniteFragmentPagerFragment)
             return fragment;
         else
             throw new IllegalArgumentException("The fragment returned by getPage must implement InfiniteFragmentPagerFragment");
     }
 
+    /**
+     * Provides the fragment that correspond to position index
+     * @param index Global position of the fragment
+     * @return
+     */
     protected abstract Fragment getPage(int index);
 
     @Override
