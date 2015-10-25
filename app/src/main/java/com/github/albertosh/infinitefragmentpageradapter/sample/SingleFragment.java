@@ -1,5 +1,6 @@
 package com.github.albertosh.infinitefragmentpageradapter.sample;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +13,9 @@ public class SingleFragment extends Fragment {
     private final static String ARG_ID = "id";
 
     private int id;
+    private int calculus;
+
+    private TextView text;
 
     public static SingleFragment newInstance(int id) {
         Bundle args = new Bundle();
@@ -32,10 +36,42 @@ public class SingleFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_single, container, false);
 
         ((TextView)root.findViewById(R.id.textId)).setText("ID: " + id);
+        text = (TextView) root.findViewById(R.id.text);
+
+        load();
+
         return root;
     }
 
-   public int getMyId() {
-       return id;
-   }
+     void load() {
+        new AsyncTask<Void,Void,Void>(){
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                // Simulate asynchronous load
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                calculus = (int) (Math.pow(id,2) * Math.signum(id));
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                text.setText("calculus: " + calculus);
+            }
+        }.execute();
+    }
+
+    public int getMyId() {
+        return id;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("calculus",calculus);
+    }
 }

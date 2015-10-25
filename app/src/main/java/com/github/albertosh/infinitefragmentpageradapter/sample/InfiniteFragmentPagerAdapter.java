@@ -78,30 +78,25 @@ public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implement
         return 3;
     }
 
-
-    /*
     @Override
     public int getItemPosition(Object object) {
-        SingleFragment fragment = (SingleFragment) object;
-        int id = fragment.getMyId();
-        int diff = id - currentIndex;
-        int newPosition;
-        if (Math.abs(diff) > 1)
-            newPosition = POSITION_NONE;
-        else
-            newPosition = diff + 1;
+        if (true) {
+            SingleFragment fragment = (SingleFragment) object;
+            int id = fragment.getMyId();
+            int diff = id - currentIndex;
+            int newPosition;
+            if (Math.abs(diff) > 1)
+                newPosition = POSITION_NONE;
+            else
+                newPosition = diff + 1;
 
-        return newPosition;
-    }
-*/
-
-    @Override
-    public int getItemPosition(Object object) {
-
-        int newPosition;
+            return newPosition;
+        } else {
+            int newPosition;
             newPosition = POSITION_NONE;
 
-        return newPosition;
+            return newPosition;
+        }
     }
 
     @Override
@@ -132,7 +127,7 @@ public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implement
             } else if (currentPageSelected == PAGE_RIGHT) {
                 swipeRight();
             }
-            viewPager.setCurrentItem(PAGE_MIDDLE, false);
+        //    viewPager.setCurrentItem(PAGE_MIDDLE, false);
             notifyDataSetChanged();
         }
     }
