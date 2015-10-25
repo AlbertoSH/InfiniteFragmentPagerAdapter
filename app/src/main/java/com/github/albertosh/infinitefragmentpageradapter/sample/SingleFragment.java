@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class SingleFragment extends Fragment {
+import com.github.albertosh.infinitefragmentpageradapter.InfiniteFragmentPagerFragment;
+
+public class SingleFragment extends Fragment implements InfiniteFragmentPagerFragment{
 
     private final static String ARG_ID = "id";
 
@@ -66,12 +68,13 @@ public class SingleFragment extends Fragment {
         }.execute();
     }
 
-    public int getMyId() {
-        return id;
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt("calculus",calculus);
+    }
+
+    @Override
+    public int getGlobalPosition() {
+        return id;
     }
 }

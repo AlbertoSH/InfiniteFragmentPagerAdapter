@@ -1,43 +1,42 @@
-package com.github.albertosh.infinitefragmentpageradapter.sample;
+package com.github.albertosh.infinitefragmentpageradapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
-public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
+public abstract class InfiniteFragmentPagerAdapter
+        extends FragmentPagerAdapter
+        implements ViewPager.OnPageChangeListener {
 
     private final static int PAGE_LEFT = 0;
     private final static int PAGE_MIDDLE = 1;
     private final static int PAGE_RIGHT = 2;
 
     private Fragment[] fragments;
-    private final int rootIndex;
-    private int currentIndex;
-    private ViewPager viewPager;
+    private int currentPageSelected;
+    private int currentCentralPosition;
 
     public InfiniteFragmentPagerAdapter(ViewPager viewPager, FragmentManager fm) {
         super(fm);
-        currentIndex = rootIndex = 0;
+        currentCentralPosition = 0;
         fragments = new Fragment[getCount()];
-        this.viewPager = viewPager;
 
+        viewPager.setOffscreenPageLimit(1);
         viewPager.setAdapter(this);
-
         viewPager.setCurrentItem(1, false);
-
         viewPager.addOnPageChangeListener(this);
     }
 
     public void swipeRight() {
-        currentIndex++;
+        currentCentralPosition++;
         fragments[PAGE_LEFT] = fragments[PAGE_MIDDLE];
         fragments[PAGE_MIDDLE] = fragments[PAGE_RIGHT];
         fragments[PAGE_RIGHT] = null;
     }
 
     public void swipeLeft() {
-        currentIndex--;
+        currentCentralPosition--;
         fragments[PAGE_RIGHT] = fragments[PAGE_MIDDLE];
         fragments[PAGE_MIDDLE] = fragments[PAGE_LEFT];
         fragments[PAGE_LEFT] = null;
@@ -62,16 +61,26 @@ public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implement
     }
 
     private Fragment getLeftPage() {
-        return SingleFragment.newInstance(currentIndex - 1);
+        return getPageChecked(currentCentralPosition - 1);
     }
 
     private Fragment getMiddlePage() {
-        return SingleFragment.newInstance(currentIndex);
+        return getPageChecked(currentCentralPosition);
     }
 
-    public Fragment getRightPage() {
-        return SingleFragment.newInstance(currentIndex + 1);
+    private Fragment getRightPage() {
+        return getPageChecked(currentCentralPosition + 1);
     }
+
+    private Fragment getPageChecked(int index) {
+        Fragment fragment = getPage(index);
+        if (fragment instanceof InfiniteFragmentPagerFragment)
+            return fragment;
+        else
+            throw new IllegalArgumentException("The fragment returned by getPage must implement InfiniteFragmentPagerFragment");
+    }
+
+    protected abstract Fragment getPage(int index);
 
     @Override
     public int getCount() {
@@ -80,36 +89,27 @@ public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implement
 
     @Override
     public int getItemPosition(Object object) {
-        if (true) {
-            SingleFragment fragment = (SingleFragment) object;
-            int id = fragment.getMyId();
-            int diff = id - currentIndex;
-            int newPosition;
-            if (Math.abs(diff) > 1)
-                newPosition = POSITION_NONE;
-            else
-                newPosition = diff + 1;
-
-            return newPosition;
-        } else {
-            int newPosition;
+        InfiniteFragmentPagerFragment fragment = (InfiniteFragmentPagerFragment) object;
+        int globalPosition = fragment.getGlobalPosition();
+        int diff = globalPosition - currentCentralPosition;
+        int newPosition;
+        if (Math.abs(diff) > 1)
             newPosition = POSITION_NONE;
+        else
+            newPosition = diff + 1;
 
-            return newPosition;
-        }
+        return newPosition;
     }
 
     @Override
     public long getItemId(int position) {
-        return currentIndex - 1 + position;
+        return currentCentralPosition - 1 + position;
     }
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
     }
-
-    int currentPageSelected;
 
     @Override
     public void onPageSelected(int position) {
@@ -127,7 +127,6 @@ public class InfiniteFragmentPagerAdapter extends FragmentPagerAdapter implement
             } else if (currentPageSelected == PAGE_RIGHT) {
                 swipeRight();
             }
-        //    viewPager.setCurrentItem(PAGE_MIDDLE, false);
             notifyDataSetChanged();
         }
     }
