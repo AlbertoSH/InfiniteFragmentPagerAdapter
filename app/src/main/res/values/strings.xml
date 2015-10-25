@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">InfiniteFragmentPagerAdapter</string>
+    <string name="loading">Loading</string>
+    <string name="done">Done</string>
 </resources>
